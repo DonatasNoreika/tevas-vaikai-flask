@@ -1,11 +1,7 @@
-from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, SubmitField, SelectField
-from wtforms.validators import DataRequired, Email, InputRequired
-from wtforms_sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
-
 import os
 from flask import Flask, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
+import forms
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 print(basedir)
@@ -13,10 +9,12 @@ print(basedir)
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'dfgsfdgsdfgsdfgsdf'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.sqlite?check_same_thread=False')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir,
+                                                                    'data.sqlite?check_same_thread=False')
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.sqlite')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
 
 class Tevas(db.Model):
     __tablename__ = "tevas"
@@ -34,23 +32,11 @@ class Vaikas(db.Model):
     tevas_id = db.Column(db.Integer, db.ForeignKey("tevas.id"))
     tevas = db.relationship("Tevas")
 
-def get_pk(obj):
-    return str(obj)
-
-class TevasForm(FlaskForm):
-    vardas = StringField('Numeris', [DataRequired()])
-    pavarde = StringField('Pavardė', [DataRequired()])
-    vaikai = QuerySelectMultipleField(query_factory=Vaikas.query.all, get_label="vardas", get_pk=get_pk)
-    submit = SubmitField('Įvesti')
-
-class VaikasForm(FlaskForm):
-    vardas = StringField('Numeris', [DataRequired()])
-    pavarde = StringField('Pavardė', [DataRequired()])
-    submit = SubmitField('Įvesti')
 
 @app.route("/")
 def index():
     return render_template("index.html")
+
 
 @app.route("/tevai")
 def parents():
@@ -59,6 +45,7 @@ def parents():
     except:
         visi_tevai = []
     return render_template("tevai.html", visi_tevai=visi_tevai)
+
 
 @app.route("/vaikai")
 def children():
@@ -72,9 +59,10 @@ def children():
 @app.route("/naujas_tevas", methods=["GET", "POST"])
 def new_parent():
     db.create_all()
-    forma = TevasForm()
+    forma = forms.TevasForm()
     if forma.validate_on_submit():
-        naujas_tevas = Tevas(vardas=forma.vardas.data, pavarde=forma.pavarde.data)
+        naujas_tevas = Tevas(vardas=forma.vardas.data,
+                             pavarde=forma.pavarde.data)
         for vaikas in forma.vaikai.data:
             priskirtas_vaikas = Vaikas.query.get(vaikas.id)
             naujas_tevas.vaikai.append(priskirtas_vaikas)
@@ -87,13 +75,15 @@ def new_parent():
 @app.route("/naujas_vaikas", methods=["GET", "POST"])
 def new_child():
     db.create_all()
-    forma = VaikasForm()
+    forma = forms.VaikasForm()
     if forma.validate_on_submit():
-        naujas_vaikas = Vaikas(vardas=forma.vardas.data, pavarde=forma.pavarde.data)
+        naujas_vaikas = Vaikas(vardas=forma.vardas.data,
+                               pavarde=forma.pavarde.data)
         db.session.add(naujas_vaikas)
         db.session.commit()
         return redirect(url_for('children'))
     return render_template("prideti_vaika.html", form=forma)
+
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8000, debug=True)
