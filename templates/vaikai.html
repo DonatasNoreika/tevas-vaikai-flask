@@ -5,13 +5,11 @@
 {% if visi_vaikai %}
 {% for vaikas in visi_vaikai %}
 <hr>
-<p>{{vaikas.vardas}}</p>
-<p>{{vaikas.pavarde}}</p>
-{% if vaikas.tevai %}
-<p>Vaikai:</p>
-{% for tevas in vaikas.tevai %}
-<p>{{tevas.vardas}} {{tevas.pavarde}}</p>
-{% endfor %}
+<p><strong>Vardas:</strong> {{vaikas.vardas}}</p>
+<p><strong>Pavardė:</strong> {{vaikas.pavarde}}</p>
+{% if vaikas.tevas %}
+<p><strong>Tėvas/motina:</strong></p>
+<p>{{vaikas.tevas.vardas}} {{vaikas.tevas.pavarde}}</p>
 {% endif %}
 
 {% endfor %}
