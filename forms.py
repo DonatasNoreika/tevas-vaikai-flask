@@ -10,6 +10,9 @@ def get_pk(obj):
 def vaikas_query():
     return app.Vaikas.query
 
+def tevas_query():
+    return app.Tevas.query
+
 class TevasForm(FlaskForm):
     vardas = StringField('Vardas', [DataRequired()])
     pavarde = StringField('Pavardė', [DataRequired()])
@@ -19,4 +22,5 @@ class TevasForm(FlaskForm):
 class VaikasForm(FlaskForm):
     vardas = StringField('Vardas', [DataRequired()])
     pavarde = StringField('Pavardė', [DataRequired()])
+    tevas = QuerySelectField(query_factory=tevas_query, get_label="vardas", get_pk=get_pk)
     submit = SubmitField('Įvesti')

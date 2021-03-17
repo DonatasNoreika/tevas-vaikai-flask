@@ -78,7 +78,7 @@ def new_child():
     forma = forms.VaikasForm()
     if forma.validate_on_submit():
         naujas_vaikas = Vaikas(vardas=forma.vardas.data,
-                               pavarde=forma.pavarde.data)
+                               pavarde=forma.pavarde.data, tevas_id=forma.tevas.data.id)
         db.session.add(naujas_vaikas)
         db.session.commit()
         return redirect(url_for('children'))
